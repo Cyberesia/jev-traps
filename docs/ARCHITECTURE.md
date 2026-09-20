@@ -28,3 +28,7 @@ The registry never determines whether the SDK allows content. Its bundled datase
 - Runtime limits and full coverage across frames, attachments and long documents.
 
 The static HTML sanitizer uses lightweight string transforms; it is not a general-purpose HTML security sanitizer. Strong XSS protection, exhaustive DOM parsing and comprehensive visual robustness are not claimed.
+
+## Website URL scans
+
+See [URL scanning](URL-SCANNING.md) for the URL-first website workflow and isolated service. `/api/scan` dispatches only to the configured authenticated worker. It does not fetch user URLs from Next.js or add results to the public registry.

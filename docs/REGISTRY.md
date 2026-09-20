@@ -70,3 +70,7 @@ The database stores only typed triage signals, route, returned model and elapsed
 Visitor quota checking and insertion now share a Postgres transaction guarded by an advisory lock, so concurrent replicas cannot race past the daily cap. All production writers must use this path. The local file fallback serializes writes within one process and is disabled in production. It is not a multi-process queue.
 
 The public feed polls every 20 seconds while visible, has a pause control, retains stale data with an error indication and animates only changed server records. It never manufactures incident events. Database pools are reused per process with a one-connection limit; use a pooled Neon connection URL and configure deployment-level request quotas for ingestion and reads. The website does not configure Vercel firewall rules for you.
+
+## Website URL scans
+
+See [URL scanning](URL-SCANNING.md) for the URL-first website workflow and isolated service. `/api/scan` dispatches only to the configured authenticated worker. It does not fetch user URLs from Next.js or add results to the public registry.

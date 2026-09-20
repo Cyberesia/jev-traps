@@ -79,12 +79,12 @@ This is a model-mediated inspection pipeline, not a proven defense against all m
 ## The registry is separate
 
 - `/` — searchable synthetic evidence collection, with explicit demo labels.
-- `/scan` — working browser-local static scan lab; pasted content never leaves the browser.
+- `/scan` — URL-first inspection through an isolated worker, with optional Jev analysis; local snippet tools remain available under developer tools.
 - `/developers` — Anthropic, OpenAI and open-weight host integration examples and data-flow table.
 - `/submit` — a private review queue for public URLs, not remote scanning or automatic publication.
 - `GET /api/check?url=…` — advisory exact URL lookup, not a scan or a safety verdict.
 
-The public app deliberately does not fetch arbitrary user URLs. A feature flag alone cannot make a public scanner safe. An Internet-facing scan service requires an isolated worker, enforced egress, DNS-rebinding defenses, quotas and authenticated job orchestration. [Registry operations →](docs/REGISTRY.md)
+The Next.js app dispatches URL inspections to the separate isolated worker; it does not fetch arbitrary user URLs itself. A feature flag alone cannot make a public scanner safe. An Internet-facing scan service requires an isolated worker, enforced egress, DNS-rebinding defenses, quotas and authenticated job orchestration. [Registry operations →](docs/REGISTRY.md)
 
 ## Local URL scan
 
@@ -116,3 +116,7 @@ The home page includes an interactive replay of **recorded synthetic evaluations
 `pnpm record:jev` intentionally performs six paid synthetic evaluations and refreshes `apps/registry/data/jev-recordings.json` with real model IDs, answers and timings. Inspect results before committing; this small sample is not an efficacy or production-performance benchmark.
 
 The observatory consumes the real configured observations endpoint, with explicit empty/error/paused states. Agent ingestion is independent of public exposure: raw signals always remain private; only non-synthetic PR-reviewed records enter the public feed. No adopter counts are invented; the [opt-in directory](docs/AGENT-DIRECTORY.md) is maintained through reviewed references.
+
+### Website URL scans
+
+The `/scan` page accepts a public HTTPS page URL and uses the separately deployed isolated scan worker. Optional Jev analysis sends bounded excerpts to TypeSafe. See [URL scanning deployment](docs/URL-SCANNING.md). No local CLI is required for website visitors; live scanning stays unavailable until the worker, production quota and Turnstile are configured.

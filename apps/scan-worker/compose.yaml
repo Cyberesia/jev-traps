@@ -1,0 +1,38 @@
+services:
+  scanner:
+    build:
+      context: ../..
+      dockerfile: apps/scan-worker/Dockerfile
+    environment:
+      SCAN_WORKER_KEY: ${SCAN_WORKER_KEY:?required}
+      EGRESS_KEY: ${EGRESS_KEY:?required}
+      EGRESS_URL: http://egress:9081
+      ENABLE_JEV: ${ENABLE_JEV:-0}
+    networks: [inspection]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1
+  egress:
+    build:
+      context: ../..
+      dockerfile: apps/scan-worker/Dockerfile
+    ports: ["127.0.0.1:9080:9081"]
+    command: ["node", "apps/scan-worker/gateway.mjs"]
+    environment:
+      EGRESS_KEY: ${EGRESS_KEY:?required}
+      TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
+      SCAN_WORKER_KEY: ${SCAN_WORKER_KEY:?required}
+    networks: [inspection, outbound]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 32
+    mem_limit: 192m
+    cpus: 0.5
+networks:
+  inspection:
+    internal: true
+  outbound: {}

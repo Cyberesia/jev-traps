@@ -1,0 +1,1 @@
+{"name":"@jev-traps/scan-worker","private":true,"type":"module","scripts":{"test":"node --test test/*.test.mjs"},"dependencies":{"@jev-traps/core":"workspace:*","@jev-traps/jev":"workspace:*","@typesafe-ai/sdk":"0.6.0"}}

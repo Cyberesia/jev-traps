@@ -52,6 +52,18 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  apps/scan-worker:
+    dependencies:
+      '@jev-traps/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@jev-traps/jev':
+        specifier: workspace:*
+        version: link:../../packages/jev
+      '@typesafe-ai/sdk':
+        specifier: 0.6.0
+        version: 0.6.0
+
   packages/core:
     devDependencies:
       '@types/node':

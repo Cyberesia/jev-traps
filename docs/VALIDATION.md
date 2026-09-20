@@ -44,3 +44,12 @@ Validated in an isolated local copy of the current working tree before applicati
 - Browser QA: desktop layout, 390px mobile layout with no horizontal overflow, attack BLOCK and quoted-research ALLOW replay states, reviewed-feed empty state; no browser warning/error logs observed.
 
 Raw agent observations stay private regardless of environment flags. The public activity API reads only non-synthetic PR-reviewed registry records. No production migration, Neon integration test, deployment, preventive crawl or GitHub push was performed in this pass. Apply migration 003 before using operator triage; configure deployment-level anti-abuse controls separately.
+
+## URL-first website scanner — 2026-09-20
+
+- Network-free suite: 69 tests passed (including seven isolated-worker transport/output tests and four scan-route tests). Build and typecheck passed.
+- Docker image built from the lockfile; two-container service started locally. Scanner has an internal-only network, read-only filesystem, all capabilities dropped, 512 MiB memory and 64-process limit. A direct request from the scanner container to the public Internet failed as expected.
+- Real public-page smoke: example.com, static mode, successful retrieval and verdict. Browser end-to-end static scan: 199 ms total in one run.
+- One intentional Jev browser smoke on example.com: returned model jev-1.13.0, one call, 949 ms total (160 ms retrieval, 789 ms inspection). This single benign example measures neither accuracy nor representative latency.
+- Browser QA: URL submission, pending state, results, explicit Jev opt-in, model provenance; desktop 1280px and mobile 390px with no horizontal overflow.
+- No production deployment, live Turnstile/Neon integration test or migration was performed. Configure the isolated service and production dependencies described in URL-SCANNING.md before enabling the hosted form.
