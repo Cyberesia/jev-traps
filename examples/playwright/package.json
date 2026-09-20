@@ -1,0 +1,13 @@
+{
+  "name": "@jev-traps/example-playwright",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "demo": "tsx index.ts" },
+  "dependencies": {
+    "@jev-traps/jev": "workspace:*",
+    "@jev-traps/playwright": "workspace:*",
+    "playwright": "1.63.0"
+  },
+  "devDependencies": { "tsx": "^4.20.0" }
+}

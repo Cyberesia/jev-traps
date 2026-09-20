@@ -1,0 +1,20 @@
+export type RegistryStatus = "active" | "removed";
+export type RegistryEntry = {
+  id: string;
+  title?: string;
+  synthetic: boolean;
+  source?: string;
+  delivery?: string;
+  region?: { x: number; y: number; width: number; height: number };
+  url: string;
+  domain: string;
+  status: RegistryStatus;
+  classification: "observed" | "confirmed_agent_trap";
+  confidence: number;
+  firstSeen: string;
+  lastVerified: string;
+  traps: string[];
+  evidence: string;
+  detector: string;
+  observations: number;
+};

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "demo-pricing-hidden",
+    "url": "https://example.test/pricing",
+    "domain": "example.test",
+    "status": "active",
+    "classification": "confirmed_agent_trap",
+    "confidence": 0.992,
+    "firstSeen": "2026-09-18T18:42:00Z",
+    "lastVerified": "2026-09-18T20:56:00Z",
+    "traps": [
+      "indirect_prompt_injection",
+      "hidden_instruction",
+      "navigation_hijacking"
+    ],
+    "evidence": "Hidden element contains an agent-directed instruction to disregard the user goal and visit an unrelated origin. Payload neutralized in this registry.",
+    "detector": "Jev Traps 0.1.0",
+    "observations": 3,
+    "title": "A hidden instruction behind the price",
+    "synthetic": true
+  },
+  {
+    "id": "demo-docs-quote",
+    "url": "https://docs.example.test/security/prompt-injection",
+    "domain": "docs.example.test",
+    "status": "removed",
+    "classification": "observed",
+    "confidence": 0.81,
+    "firstSeen": "2026-09-17T11:05:00Z",
+    "lastVerified": "2026-09-18T16:30:00Z",
+    "traps": [
+      "hidden_instruction"
+    ],
+    "evidence": "A hidden agent-directed block was observed on first scan and was no longer present on the latest verification.",
+    "detector": "Jev Traps 0.1.0",
+    "observations": 2,
+    "title": "A removed instruction in documentation",
+    "synthetic": true
+  },
+  {
+    "id": "demo-tool-action",
+    "url": "https://portal.example.test/help/agent",
+    "domain": "portal.example.test",
+    "status": "active",
+    "classification": "observed",
+    "confidence": 0.903,
+    "firstSeen": "2026-09-18T09:21:00Z",
+    "lastVerified": "2026-09-18T19:11:00Z",
+    "traps": [
+      "tool_manipulation",
+      "goal_hijacking"
+    ],
+    "evidence": "Page content addresses automated agents and asks them to perform an unrelated privileged tool action.",
+    "detector": "Jev Traps 0.1.0",
+    "observations": 1,
+    "title": "A help page requesting a privileged action",
+    "synthetic": true
+  },
+  {
+    "id": "demo-slack-image",
+    "title": "An instruction inside a support screenshot",
+    "url": "https://attachments.example.test/support.png",
+    "domain": "attachments.example.test",
+    "status": "active",
+    "classification": "observed",
+    "confidence": 0.96,
+    "firstSeen": "2026-09-20T08:00:00Z",
+    "lastVerified": "2026-09-20T08:00:00Z",
+    "traps": [
+      "visual_prompt_injection",
+      "goal_hijacking"
+    ],
+    "evidence": "Synthetic screenshot illustrates an agent-directed instruction embedded in a support conversation. Instruction text is withheld; the indicated region is illustrative.",
+    "detector": "Synthetic fixture \u00b7 not a live model result",
+    "observations": 1,
+    "synthetic": true,
+    "source": "Slack-style attachment",
+    "delivery": "PNG / screenshot",
+    "region": {
+      "x": 0.12,
+      "y": 0.58,
+      "width": 0.72,
+      "height": 0.2
+    }
+  }
+]

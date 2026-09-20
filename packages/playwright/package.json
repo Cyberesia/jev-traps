@@ -1,0 +1,47 @@
+{
+  "name": "@jev-traps/playwright",
+  "version": "0.1.0",
+  "description": "Playwright adapter for Jev Traps.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@jev-traps/core": "workspace:*",
+    "@jev-traps/jev": "workspace:*",
+    "playwright": "1.63.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.3",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyberesia/jev-traps.git",
+    "directory": "packages/playwright"
+  },
+  "homepage": "https://github.com/cyberesia/jev-traps#readme",
+  "bugs": {
+    "url": "https://github.com/cyberesia/jev-traps/issues"
+  }
+}

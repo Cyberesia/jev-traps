@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/cyberesia/jev-traps/security/advisories/new
+    about: Use private reporting for sensitive bypasses or vulnerabilities once enabled by the maintainer.

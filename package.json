@@ -1,0 +1,33 @@
+{
+  "name": "jev-traps",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Open-source agent trap detection, sanitization and public registry powered by Jev.",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22.15.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "build:packages": "pnpm --filter './packages/**' -r build",
+    "dev": "pnpm build:packages && pnpm --filter @jev-traps/registry dev",
+    "test": "pnpm build:packages && pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "benchmark": "pnpm build:packages && node benchmarks/run.mjs",
+    "benchmark:jev": "pnpm build:packages && tsx benchmarks/run-jev.ts",
+    "scan": "pnpm build:packages && tsx scripts/scan-url.ts",
+    "benchmark:visual": "pnpm build:packages && node benchmarks/visual/run.mjs",
+    "benchmark:visual:render": "node benchmarks/visual/render.mjs",
+    "benchmark:visual:live": "pnpm build:packages && tsx benchmarks/visual/live.ts",
+    "scan:image": "pnpm build:packages && tsx scripts/scan-image.ts"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.3",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11"
+  },
+  "type": "module"
+}
