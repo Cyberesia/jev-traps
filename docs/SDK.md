@@ -4,8 +4,9 @@ All packages expose ESM and TypeScript declarations. Node ≥22.15 is the suppor
 
 ## Unified entrypoint
 
-`createTraps({ semantic?, jev?, vision?, registry? })` from `@jev-traps/sdk` returns:
+`createTraps({ semantic?, jev?, destination?, vision?, registry? })` from `@jev-traps/sdk` returns:
 
+- `preflightUrl(url)` → `Promise<DestinationPreflight>`; never retrieves the destination.
 - `inspectText(text, { goal?, url?, policy?, maxEvidenceLength? })` → `Promise<InspectionReport>`.
 - `inspectHtml(html, options)` → `Promise<InspectionReport>`.
 - `inspectImage({ image, context })` → `Promise<ImageReport>`; requires explicit `vision` configuration.
@@ -13,6 +14,37 @@ All packages expose ESM and TypeScript declarations. Node ≥22.15 is the suppor
 Default text/HTML mode is static and offline. Semantic mode forwards candidates and context to TypeSafe via `@typesafe-ai/sdk`. Vision has its own explicit configuration and always classifies extracted observations with Jev. Setting `semantic: false` does not disable the Jev stage of an explicitly configured image pipeline.
 
 `requireAllowed(report)` throws unless `action === "allow"`. Place it in host middleware before adding content to a model conversation, regardless of the provider. Review and sanitize are not automatic permission to proceed.
+
+## Destination preflight
+
+Run preflight before browser navigation, retrieval tools or content scanning:
+
+```ts
+import { createTraps, SnapshotProvider, loadSnapshot } from "@jev-traps/sdk";
+
+const traps = createTraps({
+  destination: {
+    provider: new SnapshotProvider(await loadSnapshot("/secure/urlhaus.json")),
+    semantic: Boolean(process.env.TYPESAFE_API_KEY), // explicit URL/hostname disclosure
+  },
+});
+const destination = await traps.preflightUrl(url);
+if (destination.action !== "proceed") throw new Error(destination.reason);
+```
+
+The feed updater is intentionally a separate Node operation from runtime matching; import it from `@jev-traps/destination/urlhaus`. No feed data is bundled. A fresh exact active-URL match returns `stop`; stale/exact or hostname-only evidence returns `review`. Missing or expired intelligence never becomes a clean verdict. URL-level Jev is opt-in and asks independent questions about impersonation, credentials/funds, malware delivery, redirect concealment, hostname structure and benign explanations. Deterministic TypeScript maps those answers to `proceed`, `review` or `stop`.
+
+```ts
+import { refreshUrlhausSnapshot } from "@jev-traps/destination/urlhaus";
+await refreshUrlhausSnapshot({
+  authKey: process.env.URLHAUS_AUTH_KEY!,
+  cachePath: "/secure/urlhaus.json",
+});
+```
+
+Run refresh from a single trusted server-side scheduler no more often than the upstream export permits. The updater rejects redirects, malformed/tiny/rolled-back exports and retains the previous snapshot on failure. Feed credentials are never written to snapshot metadata. Feed data is not Apache-licensed by this repository; current upstream terms apply.
+
+Destination results are not `InspectionReport`s and are never sent by automatic Registry observation reporting. The host owns navigation and any explicit override.
 
 ## Submit private observations
 
@@ -51,7 +83,8 @@ Actions: `allow`, `sanitize`, `review`, `block`. Static signatures may surface a
 ## Low-level entrypoints
 
 - Core: `inspectText`, `inspectHtml`, `inspectTextStatic`, `inspectHtmlStatic`, `decideAction`, `sanitizeHtml`, `htmlToSafeText`.
-- Jev: `classifyWithJev`, `inspectTextWithJev`, `inspectHtmlWithJev`, `classifyHtmlCandidatesWithJev`.
+- Destination: `canonicalizeDestination`, `SnapshotProvider`, `loadSnapshot`, `evaluateSnapshot`.
+- Jev: `classifyWithJev`, `classifyDestinationWithJev`, `inspectTextWithJev`, `inspectHtmlWithJev`, `classifyHtmlCandidatesWithJev`.
 - Playwright: `inspectPage`, `safeSnapshot`, `assertPageAllowed`.
 - Vision: `inspectImage`, `createVisionAdapter`, `validateExtraction`.
 

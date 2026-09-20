@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
-import {publicIPv4,pageURL,fetchPage,pinnedRequest} from '../transport.mjs';
+import {DestinationStoppedError,publicIPv4,pageURL,fetchPage,pinnedRequest} from '../transport.mjs';
 import {inspectPage} from '../inspect.mjs';
 test('rejects local, reserved, encoded IP and non-HTTPS destinations',()=>{
  for(const ip of ['127.0.0.1','10.1.1.1','169.254.169.254','100.64.1.1','192.168.1.1','198.18.1.1','192.0.0.9','203.0.113.1','::ffff:127.0.0.1'])assert.equal(publicIPv4(ip),false,ip);
@@ -10,6 +10,17 @@ test('rejects local, reserved, encoded IP and non-HTTPS destinations',()=>{
 });
 test('revalidates redirects before another request',async()=>{
  let calls=0;await assert.rejects(fetchPage('https://example.com',{send:async()=>{calls++;return {status:302,headers:{location:'https://127.0.0.1/'}};}}));assert.equal(calls,1);
+});
+test('stops a reported initial URL and redirect before contacting them',async()=>{
+ let calls=0;
+ await assert.rejects(fetchPage('https://reported-site.com/payload',{preflight:async()=>({action:'stop'}),send:async()=>{calls++;}}),DestinationStoppedError);
+ assert.equal(calls,0);
+ const checked=[];
+ await assert.rejects(fetchPage('https://start-site.com/',{
+  preflight:async url=>{checked.push(url);return {action:url.includes('reported-site.com')?'stop':'proceed'};},
+  send:async()=>{calls++;return {status:302,headers:{location:'https://reported-site.com/payload'}};}
+ }),DestinationStoppedError);
+ assert.equal(calls,1);assert.deepEqual(checked,['https://start-site.com/','https://reported-site.com/payload']);
 });
 test('pins the checked IP without a second hostname lookup and keeps TLS identity',async()=>{
  let opts;const send=(o,cb)=>{opts=o;const req=new EventEmitter();req.setTimeout=()=>{};req.end=()=>{const res=new EventEmitter();res.statusCode=200;res.headers={};cb(res);res.emit('end');};return req;};

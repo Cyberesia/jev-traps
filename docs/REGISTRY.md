@@ -9,7 +9,7 @@ The evidence registry is an optional Next.js application, separate from local pr
 - `GET /api/observations`: returns only non-synthetic records already published through a reviewed PR in `data/registry.json`. It never reads the private observation store.
 - `POST /api/observations`: authenticated SDK ingestion. Accepts only schema version 1, a public normalized URL, non-allow action, bounded risk/trap types, detector version, timestamp and inspection surface. It never accepts raw evidence.
 - `POST /api/submissions`: JSON `{ "url": "https://example.com/page", "note": "Neutral observation" }`. Returns 202 and an ID **only after persistence**. Invalid input returns 400; a URL already pending review returns 409; the daily intake cap returns 429; disabled or unavailable persistence returns 503. Browser submissions are checked against the deployment origin and Cloudflare Turnstile; honeypot submissions return 403 without a persistence receipt.
-- `/scan`: browser-only deterministic text/HTML inspection. Pasted content stays local. No remote URL or image upload endpoint exists.
+- `/scan`: public HTTPS destination preflight plus isolated text/HTML retrieval and inspection when the separately deployed worker is configured. Pasted snippets remain browser-local. There is no image upload endpoint.
 
 Submissions reject IP literals, local-style domains, nonstandard ports, credentials, query strings and fragments. Validation is conservative intake hygiene, not an SSRF protection service. The route does not resolve or request the URL. Notes remain untrusted private data; never render them as HTML or execute them.
 
@@ -52,9 +52,11 @@ The script requires `DATABASE_URL`, strips control characters before printing, a
 
 Visual evidence adds `source`, `delivery` and normalized `region`. Do not upload a real private Slack/email screenshot. Publish a synthetic reconstruction with no real accounts or content instead.
 
-## Public scanning is a separate deployment project
+## Public scanning is a separate deployment
 
-Do not turn the local URL script into an API route, even behind a feature flag. Production remote scanning requires a hardened isolated worker with enforceable egress policy, DNS-rebinding-resistant destination binding, redirect controls, resource limits, job authentication, quotas, storage isolation and a redaction/review pipeline. None of those is replaced by hostname validation. This repository currently ships the library, local CLI and private intake workflow, not that public service.
+The Registry route never retrieves visitor URLs. It dispatches authenticated jobs to the shipped two-container worker only after origin, challenge and quota checks. The scanner has no direct Internet route; the egress service validates and pins public IPv4 destinations, runs local destination preflight before the initial request and each redirect, and exposes only fixed fetch and TypeSafe operations. Deploying the Registry alone does not deploy or enable this service.
+
+The optional URLhaus adapter downloads an authenticated active export into a private atomic cache on the worker host. Feed matches never become public Registry records, and a missing match is not evidence of safety. Review provider terms before enabling it, especially for commercial use. See [URL scanning](URL-SCANNING.md) for complete deployment and failure semantics.
 
 
 ## Jev-assisted private triage

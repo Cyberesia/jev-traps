@@ -8,8 +8,9 @@ createServer({requestTimeout:10000,headersTimeout:5000},async(req,res)=>{
  if(!authorized(req,process.env.SCAN_WORKER_KEY))return json(res,401,{error:'Unauthorized'});
  if(req.method!=='POST'||req.url!=='/scan')return json(res,404,{error:'Not found'});
  if(active>=2)return json(res,429,{error:'Scanner is busy. Try again shortly.'});
- let input;try{input=JSON.parse(await readBody(req));pageURL(input.url);if(typeof input.semantic!=='boolean')throw new Error();}catch{return json(res,400,{error:'Provide a public HTTPS URL without query parameters or fragments.'});}
+ let input;try{input=JSON.parse(await readBody(req));pageURL(input.url);if(typeof input.semantic!=='boolean'||input.destinationSemantic!==undefined&&typeof input.destinationSemantic!=='boolean')throw new Error();input.destinationSemantic=Boolean(input.destinationSemantic);}catch{return json(res,400,{error:'Provide a public HTTPS URL without query parameters or fragments.'});}
  if(input.semantic&&process.env.ENABLE_JEV!=='1')return json(res,503,{error:'Jev analysis is not configured.'});
+ if(input.destinationSemantic&&process.env.ENABLE_DESTINATION_JEV!=='1')return json(res,503,{error:'Jev destination assessment is not configured.'});
  active++;
  const child=fork(new URL('./inspect.mjs',import.meta.url),[],{execArgv:['--max-old-space-size=192'],stdio:['ignore','ignore','ignore','ipc'],env:{PATH:process.env.PATH,SCAN_CHILD:'1',EGRESS_URL:process.env.EGRESS_URL,EGRESS_KEY:process.env.EGRESS_KEY}});
  let finished=false;

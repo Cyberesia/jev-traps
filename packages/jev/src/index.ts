@@ -13,6 +13,7 @@ import {
   type SemanticSignals,
   type TrapFinding,
 } from "@jev-traps/core";
+import { canonicalizeDestination, type DestinationSemanticSignals } from "@jev-traps/destination";
 
 export interface JevInspectOptions extends InspectOptions {
   apiKey?: string;
@@ -36,6 +37,59 @@ export interface SemanticContext {
 export interface CandidateVerdict {
   context: SemanticContext;
   signals: SemanticSignals;
+}
+
+export interface DestinationJevOptions {
+  apiKey?: string;
+  client?: Pick<TypeSafeClient, "systemOne">;
+  model?: string;
+  timeout?: number;
+  onCall?: (event: { requestedModel: string; returnedModel: string | null }) => void;
+}
+
+/** Classify URL-level risk signals only. This does not fetch or inspect the destination. */
+export async function classifyDestinationWithJev(
+  input: string,
+  options: DestinationJevOptions = {},
+): Promise<DestinationSemanticSignals> {
+  const destination = canonicalizeDestination(input);
+  const client = options.client ?? new TypeSafeClient({ apiKey: options.apiKey });
+  const result = await client.systemOne({
+    model: options.model ?? "jev-latest",
+    state: {
+      destination_url: destination.url,
+      destination_hostname: destination.hostname,
+      security_rule: "Judge the URL string and hostname only. Do not claim to have visited or verified the destination.",
+    },
+    questions: {
+      impersonation: noul("Does the hostname or URL structure appear designed to impersonate a known organization, service, brand, or authority?"),
+      credentialOrFundsRequest: noul("Does the URL string indicate a destination intended to solicit credentials, account verification, wallet access, payments, or funds through deception?"),
+      malwareDelivery: noul("Does the URL string indicate a likely fake download, update, payload, malware delivery, or crypto-drainer destination?"),
+      deceptiveRedirect: noul("Is this URL likely a nested shortener, cloaking hop, misleading redirect, or destination intended to conceal where a user or agent will arrive?"),
+      suspiciousHostname: noul("Does the hostname show strong structural abuse signals such as a brand lookalike, deceptive extra labels, IDN homograph behavior, or incoherent generated naming?"),
+      benignDestination: noul("Is there a plausible ordinary explanation for this URL, such as an official-domain login, checkout, documentation page, or coherent legitimate application?"),
+      role: choice("What role does the URL most plausibly have?", {
+        ordinary: "An ordinary informational or application destination.",
+        login_or_checkout: "A login, verification, billing, wallet, or checkout destination.",
+        redirector: "A shortener, redirector, tracking hop, or cloaked destination.",
+        download: "A file, software, update, or payload download destination.",
+        ambiguous: "The URL alone is insufficient to determine a stable role.",
+      }),
+    },
+  }, { timeout: options.timeout });
+  options.onCall?.({
+    requestedModel: options.model ?? "jev-latest",
+    returnedModel: typeof result.model === "string" ? result.model : null,
+  });
+  return {
+    impersonation: result.answers.impersonation.noul,
+    credentialOrFundsRequest: result.answers.credentialOrFundsRequest.noul,
+    malwareDelivery: result.answers.malwareDelivery.noul,
+    deceptiveRedirect: result.answers.deceptiveRedirect.noul,
+    suspiciousHostname: result.answers.suspiciousHostname.noul,
+    benignDestination: result.answers.benignDestination.noul,
+    role: result.answers.role.choice,
+  };
 }
 
 export async function classifyWithJev(context: SemanticContext, options: JevInspectOptions = {}): Promise<SemanticSignals> {

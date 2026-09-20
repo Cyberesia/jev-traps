@@ -2,6 +2,9 @@ import { resolve4 } from 'node:dns/promises';
 import https from 'node:https';
 import { isIP } from 'node:net';
 export const MAX_BYTES = 262144;
+export class DestinationStoppedError extends Error {
+  constructor(preflight){super('Destination retrieval stopped by preflight.');this.preflight=preflight;}
+}
 export function publicIPv4(ip) {
   if (isIP(ip) !== 4) return false;
   const [a,b,c] = ip.split('.').map(Number);
@@ -34,9 +37,13 @@ export async function pinnedRequest(url, {method='GET',body,headers={},limit=MAX
     req.on('error',fail);req.setTimeout(10000,()=>req.destroy(new Error('Destination timed out.')));req.end(body);
   });
 }
-export async function fetchPage(raw,{send=pinnedRequest,signal=AbortSignal.timeout(15000)}={}) {
+export async function fetchPage(raw,{send=pinnedRequest,signal=AbortSignal.timeout(15000),preflight}={}) {
   let url=pageURL(raw);
   for(let redirects=0;redirects<=3;redirects++) {
+    if(preflight){
+      const result=await preflight(url.href);
+      if(result?.action==='stop')throw new DestinationStoppedError(result);
+    }
     const r=await send(url,{signal});
     if([301,302,303,307,308].includes(r.status)) {
       if(!r.headers.location||redirects===3)throw new Error('Too many redirects or missing destination.');

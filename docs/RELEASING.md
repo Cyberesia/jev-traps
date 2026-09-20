@@ -25,6 +25,7 @@ The public package scope `@jev-traps` must be controlled by the maintainer befor
 pnpm build:packages
 mkdir -p artifacts/packages
 pnpm --filter @jev-traps/core pack --pack-destination artifacts/packages
+pnpm --filter @jev-traps/destination pack --pack-destination artifacts/packages
 pnpm --filter @jev-traps/jev pack --pack-destination artifacts/packages
 pnpm --filter @jev-traps/vision pack --pack-destination artifacts/packages
 pnpm --filter @jev-traps/playwright pack --pack-destination artifacts/packages

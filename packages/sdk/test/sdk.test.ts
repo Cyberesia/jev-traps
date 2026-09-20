@@ -7,6 +7,22 @@ it("works offline without registry or provider",async()=>{const report=await cre
 it.each(["block","review","sanitize"])("withholds %s",action=>expect(()=>requireAllowed({action})).toThrow());
 it("requires explicit vision configuration",()=>expect(()=>createTraps().inspectImage({image:{bytes:new Uint8Array([1]),mimeType:"image/png"},context:{goal:"Read"}})).toThrow());
 
+it("stops on local destination intelligence before retrieval or registry publication",async()=>{
+ const fetchMock=vi.fn();vi.stubGlobal("fetch",fetchMock);
+ const provider={lookup:()=>({url:"https://bad.example/x",hostname:"bad.example",action:"stop" as const,checkedAt:new Date().toISOString(),intelligence:"available" as const,matches:[{source:"fixture",scope:"exact_url" as const,freshness:"fresh" as const,reportedAt:new Date().toISOString(),status:"online" as const}],reason:"Reported exact URL."})};
+ const result=await createTraps({destination:{provider},registry:{endpoint:"https://registry.example",apiKey:"secret"}}).preflightUrl("https://bad.example/x");
+ expect(result.action).toBe("stop");expect(fetchMock).not.toHaveBeenCalled();
+});
+
+it("keeps URL-level Jev explicit and applies deterministic destination policy",async()=>{
+ const client={systemOne:async()=>({model:"mock-jev",answers:{impersonation:{noul:.98},credentialOrFundsRequest:{noul:.95},malwareDelivery:{noul:.1},deceptiveRedirect:{noul:.2},suspiciousHostname:{noul:.9},benignDestination:{noul:.01},role:{choice:"login_or_checkout"}}})} as any;
+ const plain=await createTraps().preflightUrl("https://brand-login.example/verify");
+ expect(plain.action).toBe("proceed");
+ const assessed=await createTraps({destination:{semantic:true,jev:{client}}}).preflightUrl("https://brand-login.example/verify");
+ expect(assessed.action).toBe("stop");
+ expect(assessed.semantic?.returnedModel).toBe("mock-jev");
+});
+
 it("publishes a minimal observation for a non-allow URL", async () => {
   const fetchMock = vi.fn(async () =>
     new Response(JSON.stringify({ id: "observation-id", observations: 1, status: "automated_observation" }), {

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@jev-traps/core": "workspace:*",
+    "@jev-traps/destination": "workspace:*",
     "@typesafe-ai/sdk": "0.6.0"
   },
   "devDependencies": {

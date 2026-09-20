@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@jev-traps/core": "workspace:*",
+    "@jev-traps/destination": "workspace:*",
     "next": "16.3.5",
     "postgres": "^3.4.9",
     "react": "19.3.0",

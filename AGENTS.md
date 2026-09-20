@@ -47,3 +47,17 @@ The API key stays server-side in `TYPESAFE_API_KEY`.
 ## Product style
 
 The Registry is intentionally editorial and restrained, inspired by the information density of MadeWithJev rather than copied from it. Prefer strong typography, whitespace, evidence tables and quiet status colors. Avoid dashboard clutter, gradients, fake cyber visuals and sensational “malicious site” language.
+
+## Commit attribution (multi-agent work)
+
+Keep a single human `Author:`. When several agents shaped the same diff, append name-only trailers after the commit body (skip any that did not contribute):
+
+```
+Co-authored-by: Sal-ix
+Co-authored-by: Cursor
+Co-authored-by: OpenAI Codex
+Co-authored-by: Claude Code
+Co-authored-by: Grok
+Co-authored-by: Astra
+Co-authored-by: Fable
+```

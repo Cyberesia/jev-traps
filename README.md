@@ -29,6 +29,7 @@ The repository is prepared for `github.com/cyberesia/jev-traps`; the maintainer 
 | --- | --- | --- |
 | `@jev-traps/sdk` | Unified API and host enforcement helper | Only features you enable |
 | `@jev-traps/core` | Static text/HTML inspection and deterministic policy | None |
+| `@jev-traps/destination` | Local destination-intelligence snapshots and preflight policy | None at lookup; explicit updater only |
 | `@jev-traps/jev` | Atomic semantic questions through the official TypeSafe SDK | TypeSafe |
 | `@jev-traps/playwright` | Computed DOM signals and conservative safe snapshots | Your browser; optional TypeSafe |
 | `@jev-traps/vision` | Image adapters, normalized regions, semantic inspection | Selected vision endpoint, then TypeSafe |
@@ -39,6 +40,11 @@ Use these imports in a workspace consumer, or pack the packages locally until an
 import { createTraps, requireAllowed } from "@jev-traps/sdk";
 
 const traps = createTraps(); // offline static mode
+const destination = await traps.preflightUrl(sourceUrl);
+if (destination.action !== "proceed") {
+  // Stop navigation and show the typed warning/review result to the host.
+  throw new Error(destination.reason);
+}
 const report = await traps.inspectText(toolOutput, {
   goal: "Summarize today's support incidents",
 });
@@ -47,6 +53,8 @@ requireAllowed(report); // throws for sanitize, review and block
 ```
 
 For semantic inspection, export `TYPESAFE_API_KEY` server-side and use `createTraps({ semantic: true })`. Jev answers independent questions about agent direction, goal override, secret requests, tool manipulation, navigation, and benign quotation. Ordinary TypeScript determines actions and side effects. Scores are not calibrated probabilities.
+
+Destination preflight is separate from content inspection. Configure a local `DestinationIntelligenceProvider` to check a maintained snapshot before navigation; optional `destination.semantic` sends only the URL and hostname to Jev for independent URL-level judgments. A fresh exact active-URL feed match stops retrieval. Hostname-only and stale matches require review. Missing intelligence is reported as unavailable, never “clean,” and no feed match is published to the Registry automatically.
 
 Optional `registry` on `createTraps` lets server-side agents submit evidence-free private observations to the Registry site (`POST /api/observations`) after non-`allow` results on a public URL. Local enforcement is unchanged if reporting fails. See [SDK reference](docs/SDK.md) and [agent integrations](docs/INTEGRATIONS.md).
 
@@ -79,7 +87,7 @@ This is a model-mediated inspection pipeline, not a proven defense against all m
 ## The registry is separate
 
 - `/` — searchable synthetic evidence collection, with explicit demo labels.
-- `/scan` — URL-first inspection through an isolated worker, with optional Jev analysis; local snippet tools remain available under developer tools.
+- `/scan` — destination preflight followed, when permitted, by URL-first inspection through an isolated worker; URL-level and content-level Jev checks are separate opt-ins.
 - `/developers` — Anthropic, OpenAI and open-weight host integration examples and data-flow table.
 - `/submit` — a private review queue for public URLs, not remote scanning or automatic publication.
 - `GET /api/check?url=…` — advisory exact URL lookup, not a scan or a safety verdict.
@@ -119,4 +127,4 @@ The observatory consumes the real configured observations endpoint, with explici
 
 ### Website URL scans
 
-The `/scan` page accepts a public HTTPS page URL and uses the separately deployed isolated scan worker. Optional Jev analysis sends bounded excerpts to TypeSafe. See [URL scanning deployment](docs/URL-SCANNING.md). No local CLI is required for website visitors; live scanning stays unavailable until the worker, production quota and Turnstile are configured.
+The `/scan` page accepts a public HTTPS page URL and uses the separately deployed isolated scan worker. The worker checks its local destination-intelligence snapshot before network retrieval and rechecks redirects. Optional URL-level Jev sends only the URL/hostname; optional content Jev sends bounded page excerpts after retrieval. See [URL scanning deployment](docs/URL-SCANNING.md). No local CLI is required for website visitors; live scanning stays unavailable until the worker, production quota and Turnstile are configured.

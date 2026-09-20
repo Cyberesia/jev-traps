@@ -4,6 +4,7 @@ The agent's model and the detector's model are separate choices. Jev Traps does 
 
 ```text
 Tool / browser / attachment
+  → preflight destination before navigation (optional local feed; optional URL-level Jev)
   → your host intercepts the result
   → Jev Traps: static code, optionally Jev; pixels via explicit vision adapter
   → deterministic action
@@ -28,6 +29,9 @@ These are integration patterns, not bundled agent clients. Tool invocation IDs c
 | Operation | Recipient | Payload | Paid calls |
 | --- | --- | --- | --- |
 | Static text / HTML | None | Stays in process | 0 |
+| Local destination lookup | None | URL matched against an operator-managed local snapshot | 0 |
+| Destination feed refresh | Configured feed operator | Authenticated export request; key remains in updater process | No detector call |
+| Semantic destination assessment | TypeSafe | URL + hostname only; no fetched content | 1 |
 | Semantic text | TypeSafe | Text, goal, URL if supplied, static signals | 1 |
 | Semantic HTML | TypeSafe | Selected candidate contexts | Up to configured cap |
 | Image | Configured vision endpoint, then TypeSafe | Image + context; then observation text + goal | 1 vision + up to 24 Jev |
@@ -35,4 +39,4 @@ These are integration patterns, not bundled agent clients. Tool invocation IDs c
 | SDK automated observation | Registry host (`POST /api/observations`) | Normalized public URL, non-allow action, risk, trap types, detector version, surface, timestamp | No detector call; best-effort after local inspect |
 | Community report (browser) | Registry host (`POST /api/submissions`) | Public URL + note | No detector call |
 
-By default the SDK performs no Registry network I/O. When you configure `registry` on `createTraps`, non-`allow` text/HTML results with a public URL, and image results with `context.url`, submit only the minimal observation envelope above to the private inbox. Raw findings, goals, sanitized output and media bytes are never sent. Reporting failures do not change the local action. There is no hidden telemetry beyond what you explicitly configure (Registry, TypeSafe, vision). Provider SDKs and services have their own data policies. Observation metadata is operational provenance, not a guarantee of detector accuracy or site compromise.
+By default the SDK performs no Registry network I/O and no feed refresh. `preflightUrl()` uses only the provider supplied by the host; URL-level Jev runs only with `destination.semantic: true`. When you configure `registry` on `createTraps`, non-`allow` text/HTML results with a public URL, and image results with `context.url`, submit only the minimal observation envelope above to the private inbox. Destination-intelligence matches are never submitted automatically. Raw findings, goals, sanitized output and media bytes are never sent. Reporting failures do not change the local action. There is no hidden telemetry beyond what you explicitly configure (feed updater, Registry, TypeSafe, vision). Provider SDKs and services have their own data policies. Observation metadata is operational provenance, not a guarantee of detector accuracy or site compromise.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inspectTextWithJev } from "../src/index.js";
+import { classifyDestinationWithJev, inspectTextWithJev } from "../src/index.js";
 
 const mockClient = (answers: Record<string, unknown>) => ({
   systemOne: async () => ({
@@ -38,5 +38,31 @@ describe("semantic inspection", () => {
       }),
     });
     expect(report.action).toBe("block");
+  });
+});
+
+describe("destination classification", () => {
+  it("asks independent URL questions without fetching the destination", async () => {
+    let request: any;
+    const client = { systemOne: async (input: unknown) => {
+      request = input;
+      return {
+        model: "mock-jev",
+        answers: {
+          impersonation: { noul: 0.91 },
+          credentialOrFundsRequest: { noul: 0.88 },
+          malwareDelivery: { noul: 0.1 },
+          deceptiveRedirect: { noul: 0.2 },
+          suspiciousHostname: { noul: 0.84 },
+          benignDestination: { noul: 0.03 },
+          role: { choice: "login_or_checkout" },
+        },
+      };
+    } } as any;
+    const result = await classifyDestinationWithJev("https://brand-login.example/verify", { client });
+    expect(result.impersonation).toBe(0.91);
+    expect(result.role).toBe("login_or_checkout");
+    expect(request.state.destination_hostname).toBe("brand-login.example");
+    expect(Object.keys(request.questions)).toEqual(expect.arrayContaining(["impersonation", "credentialOrFundsRequest", "benignDestination"]));
   });
 });

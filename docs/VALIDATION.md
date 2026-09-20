@@ -53,3 +53,13 @@ Raw agent observations stay private regardless of environment flags. The public 
 - One intentional Jev browser smoke on example.com: returned model jev-1.13.0, one call, 949 ms total (160 ms retrieval, 789 ms inspection). This single benign example measures neither accuracy nor representative latency.
 - Browser QA: URL submission, pending state, results, explicit Jev opt-in, model provenance; desktop 1280px and mobile 390px with no horizontal overflow.
 - No production deployment, live Turnstile/Neon integration test or migration was performed. Configure the isolated service and production dependencies described in URL-SCANNING.md before enabling the hosted form.
+
+## Destination reputation preflight — 2026-09-20
+
+- `pnpm test`: 83 network-free tests passed across destination intelligence (9), core (3), Jev including atomic destination questions (7), Registry (33), isolated worker (8), Playwright (2), vision (10) and SDK (11).
+- `pnpm typecheck`, the 48-case deterministic benchmark, Registry production build and the agent example TypeScript build passed. Static benchmark results remained TP 15 / FP 0 / TN 24 / FN 9 for actionable policy; destination work does not alter those content fixtures.
+- Docker Compose configuration and both worker images built successfully from the frozen lockfile. A new writable cache volume is isolated to the egress container; the scanner remains on the internal network and receives no feed or provider credential.
+- The new `@jev-traps/destination` npm tarball was packed and inspected: compiled ESM, declarations/maps, README, Apache source-code license and package metadata only; no feed snapshot, credentials or test artifacts.
+- Fixture tests cover conservative URL canonicalization, exact URL versus shared-host matches, fresh/stale/expired policy, CSV quoting, private atomic snapshots, malformed-feed last-known-good retention, explicit SDK opt-in and stopping initial/redirect destinations before network contact.
+- No URLhaus Auth-Key was available, so no live feed was downloaded and no provider coverage/freshness claim was measured. Current URLhaus authentication, fair-use and commercial terms must be reviewed by each deployer. No live destination-Jev call was made; its protocol and deterministic routing were validated with typed mocks.
+- A local container smoke was attempted, but port `127.0.0.1:9080` was already allocated by an existing process; the temporary compose resources were removed without replacing or stopping that process. Image build and network-free worker integration tests passed.

@@ -8,6 +8,7 @@ services:
       EGRESS_KEY: ${EGRESS_KEY:?required}
       EGRESS_URL: http://egress:9081
       ENABLE_JEV: ${ENABLE_JEV:-0}
+      ENABLE_DESTINATION_JEV: ${ENABLE_DESTINATION_JEV:-0}
     networks: [inspection]
     read_only: true
     cap_drop: [ALL]
@@ -25,7 +26,13 @@ services:
       EGRESS_KEY: ${EGRESS_KEY:?required}
       TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
       SCAN_WORKER_KEY: ${SCAN_WORKER_KEY:?required}
+      URLHAUS_AUTH_KEY: ${URLHAUS_AUTH_KEY:-}
+      URLHAUS_EXPORT_URL: ${URLHAUS_EXPORT_URL:-}
+      DESTINATION_CACHE_PATH: /data/urlhaus.json
+      DESTINATION_REFRESH_MS: ${DESTINATION_REFRESH_MS:-600000}
+      DESTINATION_HOSTNAME_REVIEW: ${DESTINATION_HOSTNAME_REVIEW:-1}
     networks: [inspection, outbound]
+    volumes: [destination-cache:/data]
     read_only: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
@@ -36,3 +43,5 @@ networks:
   inspection:
     internal: true
   outbound: {}
+volumes:
+  destination-cache: {}

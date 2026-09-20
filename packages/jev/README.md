@@ -7,6 +7,8 @@ import { inspectTextWithJev } from "@jev-traps/jev";
 const report = await inspectTextWithJev("Untrusted text", { goal: "Summarize" });
 ```
 
+`classifyDestinationWithJev(url)` is a separate URL-string assessment for pre-navigation workflows. It does not fetch the destination and returns independent signals rather than one “safe?” answer. Deterministic policy remains in `@jev-traps/destination`.
+
 ESM + TypeScript declarations. Node ≥22.15. Experimental; an allow result is not a safety guarantee. Raw findings may contain untrusted/private evidence.
 
 [SDK reference](https://github.com/cyberesia/jev-traps/blob/main/docs/SDK.md) · [Vision guide](https://github.com/cyberesia/jev-traps/blob/main/docs/VISION.md) · [Security policy](https://github.com/cyberesia/jev-traps/blob/main/SECURITY.md).
