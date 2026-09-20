@@ -48,6 +48,8 @@ requireAllowed(report); // throws for sanitize, review and block
 
 For semantic inspection, export `TYPESAFE_API_KEY` server-side and use `createTraps({ semantic: true })`. Jev answers independent questions about agent direction, goal override, secret requests, tool manipulation, navigation, and benign quotation. Ordinary TypeScript determines actions and side effects. Scores are not calibrated probabilities.
 
+Optional `registry` on `createTraps` lets server-side agents submit evidence-free private observations to the Registry site (`POST /api/observations`) after non-`allow` results on a public URL. Local enforcement is unchanged if reporting fails. See [SDK reference](docs/SDK.md) and [agent integrations](docs/INTEGRATIONS.md).
+
 ## Image and screenshot inspection
 
 ```ts
@@ -105,3 +107,12 @@ The 48-case synthetic static corpus is a regression test, not an efficacy certif
 ## License
 
 [Apache-2.0](LICENSE). Contributions are accepted under the same license. This project is independent; naming an agent provider does not imply endorsement or certification.
+
+
+## See Jev's decisions
+
+The home page includes an interactive replay of **recorded synthetic evaluations**, not simulated live incidents. `/how-it-works` explains the atomic questions, risk policy, operator-triggered report triage and publication path. `/preventive` specifies a future bounded scanning program for sources agents actually use; it does not run a crawler.
+
+`pnpm record:jev` intentionally performs six paid synthetic evaluations and refreshes `apps/registry/data/jev-recordings.json` with real model IDs, answers and timings. Inspect results before committing; this small sample is not an efficacy or production-performance benchmark.
+
+The observatory consumes the real configured observations endpoint, with explicit empty/error/paused states. Agent ingestion is independent of public exposure: raw signals always remain private; only non-synthetic PR-reviewed records enter the public feed. No adopter counts are invented; the [opt-in directory](docs/AGENT-DIRECTORY.md) is maintained through reviewed references.

@@ -2,7 +2,7 @@
 
 ## Offline checks
 
-- `pnpm test`: 34 passing tests across core (3), Jev (2), Playwright (2), vision (10), SDK (5) and registry intake (12).
+- `pnpm test`: 49 passing tests across core (3), Jev (2), Playwright (2), vision (10), SDK (8) and registry (24: intake + automated observations).
 - `pnpm typecheck`: all workspace packages and the registry pass.
 - `pnpm --filter @jev-traps/registry build`: production build succeeds; home, scan lab, developer guide, intake and four evidence pages generated.
 - `pnpm benchmark`: 48 synthetic static cases. Candidate prefilter: TP 24 / FP 12 / TN 12 / FN 0. Actionable policy: TP 15 / FP 0 / TN 24 / FN 9. These are corpus regression results, not general efficacy estimates.
@@ -32,3 +32,15 @@ The production preview was inspected at localhost:3044. Desktop and 390 px mobil
 No image-provider key/model was configured, so no real Anthropic/OpenAI/open-weight vision run was performed. Provider request protocols, response validation, estimated regions, benign quotation behavior and failure handling were tested with mocks. Adversarial visual efficacy remains unvalidated.
 
 No public URL scanning service, durable multi-host queue, reviewer authentication, automatic re-verification or PDF decoder is included. Public intake remains disabled by default in production. No GitHub push, npm publication or public deployment was performed.
+
+## Jev explainability and private registry refinement — 2026-09-20
+
+Validated in an isolated local copy of the current working tree before application:
+- `pnpm test`: 58 passing tests (core 3, Jev 6, registry 28, Playwright 2, vision 10, SDK 9).
+- `pnpm build` and `pnpm typecheck`: passed.
+- `pnpm benchmark`: 48 deterministic cases; actionable static policy TP 15, FP 0, TN 24, FN 9. Static detection alone is incomplete.
+- `pnpm benchmark:visual`: six fixture contracts (four attacks, two benign); this does not measure visual detection efficacy.
+- Six intentional synthetic Jev calls recorded with returned model `jev-1.13.0`: text 820/733/472 ms; triage 263/300/364 ms. Three expected triage routes matched. Timings include network; these are examples, not a representative latency or accuracy benchmark.
+- Browser QA: desktop layout, 390px mobile layout with no horizontal overflow, attack BLOCK and quoted-research ALLOW replay states, reviewed-feed empty state; no browser warning/error logs observed.
+
+Raw agent observations stay private regardless of environment flags. The public activity API reads only non-synthetic PR-reviewed registry records. No production migration, Neon integration test, deployment, preventive crawl or GitHub push was performed in this pass. Apply migration 003 before using operator triage; configure deployment-level anti-abuse controls separately.

@@ -21,7 +21,9 @@
     "benchmark:visual": "pnpm build:packages && node benchmarks/visual/run.mjs",
     "benchmark:visual:render": "node benchmarks/visual/render.mjs",
     "benchmark:visual:live": "pnpm build:packages && tsx benchmarks/visual/live.ts",
-    "scan:image": "pnpm build:packages && tsx scripts/scan-image.ts"
+    "scan:image": "pnpm build:packages && tsx scripts/scan-image.ts",
+    "record:jev": "tsx scripts/record-jev-examples.ts",
+    "triage:submission": "tsx scripts/triage-submission.ts"
   },
   "devDependencies": {
     "@types/node": "22.20.3",

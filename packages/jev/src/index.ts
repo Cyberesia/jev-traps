@@ -208,3 +208,5 @@ export async function inspectHtmlWithJev(html: string, options: JevInspectOption
     meta: { detectorVersion: `${DETECTOR_VERSION}+jev`, staticFindings: staticFindings.length, semanticFindings: semFindings.length },
   };
 }
+
+export { triageReportWithJev, type ReportTriage, type TriageOptions } from "./triage.js";

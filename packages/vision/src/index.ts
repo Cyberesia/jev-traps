@@ -5,7 +5,7 @@ export { createVisionAdapter } from "./providers.js";
 
 export interface Region { x: number; y: number; width: number; height: number }
 export interface ImageInput { bytes: Uint8Array; mimeType: "image/png" | "image/jpeg" | "image/webp" }
-export interface ImageContext { source?: string; channel?: string; goal: string }
+export interface ImageContext { source?: string; channel?: string; url?: string; goal: string }
 export interface VisualObservation {
   text: string;
   description: string;

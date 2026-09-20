@@ -32,6 +32,7 @@ These are integration patterns, not bundled agent clients. Tool invocation IDs c
 | Semantic HTML | TypeSafe | Selected candidate contexts | Up to configured cap |
 | Image | Configured vision endpoint, then TypeSafe | Image + context; then observation text + goal | 1 vision + up to 24 Jev |
 | Registry check | Registry host | Queried public URL | No detector call |
-| Registry submit | Registry host | Public URL + note | No detector call |
+| SDK automated observation | Registry host (`POST /api/observations`) | Normalized public URL, non-allow action, risk, trap types, detector version, surface, timestamp | No detector call; best-effort after local inspect |
+| Community report (browser) | Registry host (`POST /api/submissions`) | Public URL + note | No detector call |
 
-No registry lookup or publication occurs inside any SDK method. No telemetry, analytics or scan-result uploads are added by this project. Provider SDKs and services have their own data policies. Report metadata is operational provenance, not a guarantee of detector accuracy.
+By default the SDK performs no Registry network I/O. When you configure `registry` on `createTraps`, non-`allow` text/HTML results with a public URL, and image results with `context.url`, submit only the minimal observation envelope above to the private inbox. Raw findings, goals, sanitized output and media bytes are never sent. Reporting failures do not change the local action. There is no hidden telemetry beyond what you explicitly configure (Registry, TypeSafe, vision). Provider SDKs and services have their own data policies. Observation metadata is operational provenance, not a guarantee of detector accuracy or site compromise.

@@ -6,7 +6,8 @@ export type TrapType =
   | "navigation_hijacking"
   | "hidden_instruction"
   | "obfuscated_instruction"
-  | "suspicious_scheme";
+  | "suspicious_scheme"
+  | "visual_prompt_injection";
 
 export type TrapAction = "allow" | "sanitize" | "review" | "block";
 export type DetectorKind = "static" | "semantic";

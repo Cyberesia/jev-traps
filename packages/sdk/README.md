@@ -8,6 +8,8 @@ const report = await createTraps().inspectText("Untrusted text");
 requireAllowed(report);
 ```
 
+To submit private evidence-free non-allow observations from protected agents, configure the optional server-side `registry` endpoint and ingestion key. The Registry remains optional and reporting failures never affect local enforcement. See the SDK reference for the data contract.
+
 ESM + TypeScript declarations. Node ≥22.15. Experimental; an allow result is not a safety guarantee. Raw findings may contain untrusted/private evidence.
 
 [SDK reference](https://github.com/cyberesia/jev-traps/blob/main/docs/SDK.md) · [Vision guide](https://github.com/cyberesia/jev-traps/blob/main/docs/VISION.md) · [Security policy](https://github.com/cyberesia/jev-traps/blob/main/SECURITY.md).
